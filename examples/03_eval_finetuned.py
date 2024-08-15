@@ -27,26 +27,30 @@ import wandb
 sys.path.append("path/to/your/act")
 
 # keep this to register ALOHA sim env
-from envs.aloha_sim_env import AlohaGymEnv  # noqa
+# from envs.aloha_sim_env import AlohaGymEnv  # noqa
 
 from octo.model.octo_model import OctoModel
 from octo.utils.gym_wrappers import HistoryWrapper, NormalizeProprio, RHCWrapper
 from octo.utils.train_callbacks import supply_rng
 
-FLAGS = flags.FLAGS
+# FLAGS = flags.FLAGS
+#
+# # flags.DEFINE_string(
+# #     "finetuned_path", None, "Path to finetuned Octo checkpoint directory."
+# # )
 
-flags.DEFINE_string(
-    "finetuned_path", None, "Path to finetuned Octo checkpoint directory."
-)
 
 
 def main(_):
     # setup wandb for logging
-    wandb.init(name="eval_aloha", project="octo")
+    wandb.init(name="eval_furniturebench", project="octo")
 
-    # load finetuned model
-    logging.info("Loading finetuned model...")
-    model = OctoModel.load_pretrained(FLAGS.finetuned_path)
+    print("in main...")
+
+    # load model
+    logging.info("Loading model...")
+    # model = OctoModel.load_pretrained(FLAGS.finetuned_path)
+    model = OctoModel.load_pretrained("hf://rail-berkeley/octo-small")
 
     # make gym environment
     ##################################################################################################################
@@ -62,6 +66,7 @@ def main(_):
     #     }
     #   }
     ##################################################################################################################
+    '''
     env = gym.make("aloha-sim-cube-v0")
 
     # wrap env to normalize proprio
@@ -108,7 +113,7 @@ def main(_):
         wandb.log(
             {"rollout_video": wandb.Video(np.array(images).transpose(0, 3, 1, 2)[::2])}
         )
-
+        '''
 
 if __name__ == "__main__":
     app.run(main)
