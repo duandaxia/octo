@@ -24,7 +24,7 @@ import jax
 import numpy as np
 import wandb
 
-sys.path.append("path/to/your/act")
+sys.path.append("/proj/daxia/octo/act")
 
 # keep this to register ALOHA sim env
 # from envs.aloha_sim_env import AlohaGymEnv  # noqa
@@ -33,11 +33,11 @@ from octo.model.octo_model import OctoModel
 from octo.utils.gym_wrappers import HistoryWrapper, NormalizeProprio, RHCWrapper
 from octo.utils.train_callbacks import supply_rng
 
-# FLAGS = flags.FLAGS
-#
-# # flags.DEFINE_string(
-# #     "finetuned_path", None, "Path to finetuned Octo checkpoint directory."
-# # )
+FLAGS = flags.FLAGS
+
+flags.DEFINE_string(
+    "finetuned_path", None, "Path to finetuned Octo checkpoint directory."
+)
 
 
 
@@ -66,7 +66,7 @@ def main(_):
     #     }
     #   }
     ##################################################################################################################
-    '''
+    
     env = gym.make("aloha-sim-cube-v0")
 
     # wrap env to normalize proprio
@@ -113,7 +113,7 @@ def main(_):
         wandb.log(
             {"rollout_video": wandb.Video(np.array(images).transpose(0, 3, 1, 2)[::2])}
         )
-        '''
+        
 
 if __name__ == "__main__":
     app.run(main)
