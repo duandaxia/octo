@@ -30,11 +30,12 @@ from octo.utils.train_utils import (
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string(
-    "pretrained_path", None, "Path to pre-trained Octo checkpoint directory."
+    "pretrained_path", "hf://rail-berkeley/octo-small-1.5", "Path to pre-trained Octo checkpoint directory."
 )
-flags.DEFINE_string("data_dir", None, "Path to finetuning dataset, in RLDS format.")
-flags.DEFINE_string("save_dir", None, "Directory for saving finetuning checkpoints.")
+flags.DEFINE_string("data_dir", "/proj/daxia/octo_data/aloha_sim_dataset/aloha_sim_cube_scripted_dataset/1.0.0", "Path to finetuning dataset, in RLDS format.")
+flags.DEFINE_string("save_dir", "result", "Directory for saving finetuning checkpoints.")
 flags.DEFINE_integer("batch_size", 128, "Batch size for finetuning.")
+flags.DEFINE_float("data_size",0.5, "Data protion to original size for finetuning.")
 
 flags.DEFINE_bool(
     "freeze_transformer",
@@ -53,7 +54,7 @@ def main(_):
     tf.config.set_visible_devices([], "GPU")
 
     # setup wandb for logging
-    wandb.init(name="finetune_aloha", project="octo")
+    wandb.init(name="finetune_aloha_test_datasize", project="octo")
 
     # load pre-trained model
     logging.info("Loading pre-trained model...")
@@ -64,7 +65,7 @@ def main(_):
     # delete goal images in the data loader since we will train a language-conditioned-only policy
     # TODO: directly load this from raw data to make it less opaque?
     logging.info("Loading finetuning dataset...")
-    dataset = make_single_dataset(
+    dataset_o = make_single_dataset(
         dataset_kwargs=dict(
             name="aloha_sim_cube_scripted_dataset",
             data_dir=FLAGS.data_dir,
@@ -81,6 +82,13 @@ def main(_):
         ),
         train=True,
     )
+
+    #print("dataset size: ", dataset_o.as_numpy_iterator().size())
+    print("dataset size: ", len(dataset_o))
+    dataset=dataset.shuffle(dataset_o.cardinality())
+    dataset = dataset_o.take(round(len(dataset_o)*FLAGS.data_size))
+    print(len(dataset))
+    
     train_data_iter = (
         dataset.repeat()
         .unbatch()

@@ -85,7 +85,7 @@ def main(_):
     )
 
     # running rollouts
-    for _ in range(3):
+    for _ in range(10):
         obs, info = env.reset()
 
         # create task specification --> use model utility to create task dict with correct entries
